@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Message.Integration.Api
@@ -43,7 +44,7 @@ namespace Message.Integration.Api
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Casino Data Service V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Message Integration V1");
                 c.RoutePrefix = "swagger";
             });
 
@@ -63,7 +64,7 @@ namespace Message.Integration.Api
             {
                 options.SwaggerDoc("v1", new Info { Title = "Message Integration Api", Version = "v1" });
 
-                var filePath = Path.Combine(System.AppContext.BaseDirectory, "Message.Integration.Api.xml");
+                var filePath = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "Message.Integration.Api.xml");
                 options.IncludeXmlComments(filePath);
             });
         }
