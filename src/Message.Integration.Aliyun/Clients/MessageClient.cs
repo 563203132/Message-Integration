@@ -18,7 +18,7 @@ namespace Message.Integration.Aliyun.Clients
             request.Domain = "dysmsapi.aliyuncs.com";
             request.Version = "2017-05-25";
             request.Action = "SendSms";
-            // request.Protocol = ProtocolType.HTTP;
+            request.Protocol = ProtocolType.HTTP;
             request.AddQueryParameters("PhoneNumbers", "18739974753");
             request.AddQueryParameters("SignName", "寻医问药");
             request.AddQueryParameters("TemplateCode", "SMS_174991632");
