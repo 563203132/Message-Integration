@@ -5,9 +5,11 @@ VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Message.Integration.Api", "src\Message.Integration.Api\Message.Integration.Api.csproj", "{02DE331B-47DE-4234-8572-963A1D3BA99B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Message.Integration.Aliyun", "src\Message.Integration.Aliyun\Message.Integration.Aliyun.csproj", "{3BE80D6F-C306-499A-8ABC-BF78ECAFFD93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Message.Integration.Aliyun", "src\Message.Integration.Aliyun\Message.Integration.Aliyun.csproj", "{3BE80D6F-C306-499A-8ABC-BF78ECAFFD93}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D95E4268-18FB-40E2-9267-D034B66859FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Message.Integration.Common", "src\Message.Integration.Common\Message.Integration.Common.csproj", "{F5B1C81A-2E66-4CF2-8A84-718BE91F3D3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{D95E4268-18FB-40E2-9267-D034B66859FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D95E4268-18FB-40E2-9267-D034B66859FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D95E4268-18FB-40E2-9267-D034B66859FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5B1C81A-2E66-4CF2-8A84-718BE91F3D3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5B1C81A-2E66-4CF2-8A84-718BE91F3D3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5B1C81A-2E66-4CF2-8A84-718BE91F3D3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5B1C81A-2E66-4CF2-8A84-718BE91F3D3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,6 +2,6 @@
 {
     public interface IMessageClient
     {
-        void Send(string accessKeyId, string secret, string message);
+        void Send(string accessKeyId, string secret, MessageContent message);
     }
 }
