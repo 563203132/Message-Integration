@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CacheManager.Core;
 using Message.Integration.Aliyun.Clients;
+using Message.Integration.Api.Filters;
+using Message.Integration.Common.Configurations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.AspNetCore.Swagger;
+using System.IO;
 
 namespace Message.Integration.Api
 {
@@ -25,16 +22,19 @@ namespace Message.Integration.Api
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            InjectConfig(services);
+            InjectRedis(services);
             InjectSwagger(services);
             InjectClients(services);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(ExceptionFilter));
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -51,6 +51,31 @@ namespace Message.Integration.Api
             app.UseSwagger();
 
             app.UseMvc();
+        }
+
+        private void InjectConfig(IServiceCollection services)
+        {
+            services.Configure<AliyunSMSConfig>(Configuration.GetSection("AliyunSMSConfig"));
+        }
+
+        private void InjectRedis(IServiceCollection services)
+        {
+            var redisConfig = new RedisConfig();
+            Configuration.GetSection("RedisConfig").Bind(redisConfig);
+
+            var cacheManagerConfig =
+                CacheManager.Core.ConfigurationBuilder.BuildConfiguration(settings =>
+                {
+                    settings.WithJsonSerializer()
+                        .WithMicrosoftMemoryCacheHandle("memory")
+                        .And
+                        .WithRedisConfiguration("redis", redisConfig.Servers)
+                        .WithRedisBackplane("redis")
+                        .WithRedisCacheHandle("redis", true);
+                });
+
+            services.AddSingleton(cacheManagerConfig);
+            services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
         }
 
         private void InjectClients(IServiceCollection services)

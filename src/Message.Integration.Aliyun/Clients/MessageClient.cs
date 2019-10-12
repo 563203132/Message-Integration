@@ -2,39 +2,60 @@
 using Aliyun.Acs.Core.Exceptions;
 using Aliyun.Acs.Core.Http;
 using Aliyun.Acs.Core.Profile;
+using Message.Integration.Common;
+using Message.Integration.Common.Configurations;
+using Message.Integration.Common.Exceptions;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 
 namespace Message.Integration.Aliyun.Clients
 {
     public class MessageClient : IMessageClient
     {
-        public void Send(string accessKeyId, string secret, MessageContent message)
+        public readonly IOptions<AliyunSMSConfig> _config;
+
+        public MessageClient(IOptions<AliyunSMSConfig> config)
         {
-            IClientProfile profile = DefaultProfile.GetProfile("cn-hangzhou", accessKeyId, secret);
+            _config = config;
+        }
+
+        public void Send(string phoneNumber, string code)
+        {
+            IClientProfile profile = DefaultProfile.GetProfile("cn-hangzhou", _config.Value.AccessKeyId,  string.Empty);
             DefaultAcsClient client = new DefaultAcsClient(profile);
             CommonRequest request = new CommonRequest();
             request.Method = MethodType.POST;
-            request.Domain = "dysmsapi.aliyuncs.com";
+            request.Domain = _config.Value.Domain;
             request.Version = "2017-05-25";
             request.Action = "SendSms";
             request.Protocol = ProtocolType.HTTP;
-            request.AddQueryParameters("PhoneNumbers", "18739974753");
-            request.AddQueryParameters("SignName", "寻医问药");
-            request.AddQueryParameters("TemplateCode", "SMS_174991632");
-            request.AddQueryParameters("TemplateParam", JsonConvert.SerializeObject(message));
-            try
+            request.AddQueryParameters("PhoneNumbers", phoneNumber);
+            request.AddQueryParameters("SignName", _config.Value.SignName);
+            request.AddQueryParameters("TemplateCode", _config.Value.TemplateCode);
+            request.AddQueryParameters("TemplateParam", JsonConvert.SerializeObject(new MessageContent { Code = code }, new JsonSerializerSettings
             {
-                CommonResponse response = client.GetCommonResponse(request);
-                Console.WriteLine(System.Text.Encoding.Default.GetString(response.HttpResponse.Content));
-            }
-            catch (ServerException e)
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            }));
+
+            CommonResponse response = client.GetCommonResponse(request);
+            Console.WriteLine(System.Text.Encoding.Default.GetString(response.HttpResponse.Content));
+
+            if (response.HttpStatus >= 400)
             {
-                Console.WriteLine(e);
-            }
-            catch (ClientException e)
-            {
-                Console.WriteLine(e);
+                AliyunSMSReponse content = null;
+
+                try
+                {
+                    content = JsonConvert.DeserializeObject<AliyunSMSReponse>(response.Data);
+                }
+                catch (Exception ex)
+                {
+                    throw new MessageException(Constants.CODE_UNKONWN_ERROR, response.Data, ex);
+                }
+
+                throw new MessageException(Constants.CODE_UNKONWN_ERROR, content.Message);
             }
         }
     }
